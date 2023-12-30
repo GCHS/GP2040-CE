@@ -152,6 +152,10 @@ void AnimationStation::SetMode(uint8_t mode) {
     this->baseAnimation = new CustomTheme(matrix);
     this->buttonAnimation = new CustomThemePressed(matrix, lastPressed);
     break;
+  case AnimationEffects::EFFECT_RAINBOW_SCROLL:
+    this->baseAnimation = new RainbowScroll(matrix);
+    this->buttonAnimation = new ButtonWaves(matrix, lastPressed);
+    break;
   default:
     this->baseAnimation = new StaticColor(matrix);
     this->buttonAnimation = new StaticColor(matrix, lastPressed);
