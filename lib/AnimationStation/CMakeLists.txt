@@ -1,8 +1,11 @@
 add_library(AnimationStation
+src/Effects/ButtonWave/ButtonWaves.cpp
+src/Effects/ButtonWave/BakedButtonDistances.cpp
 src/Effects/Chase.cpp
 src/Effects/CustomTheme.cpp
 src/Effects/CustomThemePressed.cpp
 src/Effects/Rainbow.cpp
+src/Effects/RainbowScroll.cpp
 src/Effects/StaticColor.cpp
 src/Effects/StaticTheme.cpp
 src/AnimationStation.cpp

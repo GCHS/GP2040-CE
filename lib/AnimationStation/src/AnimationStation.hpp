@@ -10,10 +10,12 @@
 
 #include "NeoPico.hpp"
 #include "Animation.hpp"
+#include "Effects/ButtonWave/ButtonWaves.hpp"
 #include "Effects/Chase.hpp"
 #include "Effects/CustomTheme.hpp"
 #include "Effects/CustomThemePressed.hpp"
 #include "Effects/Rainbow.hpp"
+#include "Effects/RainbowScroll.hpp"
 #include "Effects/StaticColor.hpp"
 #include "Effects/StaticTheme.hpp"
 
@@ -23,10 +25,11 @@ typedef enum
   EFFECT_RAINBOW,
   EFFECT_CHASE,
   EFFECT_STATIC_THEME,
+  EFFECT_RAINBOW_SCROLL,
   EFFECT_CUSTOM_THEME,
 } AnimationEffects;
 
-const int TOTAL_EFFECTS = 4; // Exclude custom theme until verified present
+const int TOTAL_EFFECTS = 5; // Exclude custom theme until verified present
 
 typedef enum
 {
