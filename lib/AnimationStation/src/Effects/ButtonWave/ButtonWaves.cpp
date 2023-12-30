@@ -3,11 +3,32 @@
 #include <algorithm>
 #include "BakedButtonDistances.hpp"
 
-ButtonWaves::ButtonWaves(PixelMatrix &matrix) : Animation(matrix){}
+constexpr std::array<Color, 16> RANDOM_COLORS{
+	Color(0.859375f, 0.0f,        0.5f),      // magenta
+	Color(1.0f,      0.29296875f, 0.8515625f),// pink
+	Color(1.0f,      0.0625f,     0.0f),      // red
+	Color(1.0f,      0.5f,        0.0f),      // red-orange
+	Color(0.859375f, 0.5f,        0.0f),      // orange
+	Color(1.0f,      1.0f,        0.0f),      // yellow
+	Color(0.5f,      0.859375f,   0.0f),      // lime green
+	Color(0.0f,      1.0f,        0.5f),      // cyan
+	Color(0.0f,      0.859375f,   0.859375f), // blue
+	Color(0.0f,      0.5f,        1.0f),      // cobalt blue
+	Color(0.0625f,   0.0f,        1.0f),      // violet?
+	Color(0.5f,      0.0f,        0.859375f), // purple
+	Color(0.5f,      0.75f,       0.859375f), // lilac?
+	Color(1.0f,      1.0f,        1.0f),      // white
+	Color(1.5f,      1.5f,        1.5f),      // superwhite
+	Color(1.25f,     1.0f,        1.6f),      // superpurple
+};
 
-ButtonWaves::ButtonWaves (PixelMatrix &matrix, std::vector<Pixel> &pixels) : Animation(matrix), pressed(&pixels) {
-	
+Color getRandomColor() {
+	return RANDOM_COLORS[(time_us_32() * 13)%RANDOM_COLORS.size()];
 }
+
+ButtonWaves::ButtonWaves(PixelMatrix &matrix) : Animation(matrix) {}
+
+ButtonWaves::ButtonWaves (PixelMatrix &matrix, std::vector<Pixel> &pixels) : Animation(matrix), pressed(&pixels) {}
 
 ButtonWaves::~ButtonWaves() { pressed = nullptr; }
 
@@ -17,7 +38,7 @@ void ButtonWaves::Animate(RGB (&frame)[100]) {
 		auto pMask = 1UL << p.index;
 		isPressed |= pMask;
 		if(pMask & ~wasPressed){
-			addWave(p.index, Color(1,1,1));
+			addWave(p.index, getRandomColor());
 		}
 	}
 
