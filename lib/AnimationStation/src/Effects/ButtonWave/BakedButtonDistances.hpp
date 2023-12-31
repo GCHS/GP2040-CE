@@ -2,6 +2,8 @@
 #define _BAKED_BUTTON_DISTANCES_H_
 
 #include <array>
+#include <unordered_map>
+#include "stdint.h"
 
 struct Point {
 	float x, y;
@@ -30,12 +32,14 @@ static constexpr std::array<Point, BUTTON_COUNT> BUTTON_COORDS{
 	Point{5.0, 2.5}, //K1
 	Point{5.0, 3.5}, //UP
 };
+
+
  class ButtonDistanceTable{ //only stores the upper triangle of the distances matrix
 	static constexpr int size = (BUTTON_COUNT * BUTTON_COUNT - BUTTON_COUNT) / 2;
 	static const std::array<float, size> distances;
 	static inline int getLinearIdx(const int i, const int j);
  public:
-	 float operator()(const int i, const int j) const;
+	float operator()(const int i, const int j) const;
 };
 #endif
 
