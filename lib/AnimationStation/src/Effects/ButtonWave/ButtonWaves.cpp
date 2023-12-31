@@ -42,21 +42,24 @@ void ButtonWaves::Animate(RGB (&frame)[100]) {
 		}
 	}
 
-	std::vector<Color> hdrFramebuffer{};
-	hdrFramebuffer.reserve(12);
+	std::vector<Color> hdrFramebuffer{matrix->getPixelCount()};
 
-	for(const auto& row : matrix->pixels){
-		for(const auto& px : row){
-			hdrFramebuffer.emplace_back(frame[px.positions[0]]);
+	for(const auto& col : matrix->pixels){
+		for(const auto& px : col){
+			if(px.index >= 0){
+				hdrFramebuffer[px.index] = Color{frame[px.positions[0]]};
+			}
 		}
 	}
 
 	drawWaves(hdrFramebuffer);
 
-	for(const auto& row : matrix->pixels){
-		for(const auto& px : row){
-			for(const auto led : px.positions){
-				frame[led] = RGB{hdrFramebuffer[px.index]};
+	for(const auto& col : matrix->pixels){
+		for(const auto& px : col){
+			if(px.index >= 0){
+				for(const auto led : px.positions){
+					frame[led] = RGB{hdrFramebuffer[px.index]};
+				}
 			}
 		}
 	}
