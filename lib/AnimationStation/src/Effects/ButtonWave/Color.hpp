@@ -54,5 +54,8 @@ struct __attribute__((__packed__)) Color {
 	constexpr Color under(const Color &over) const {
 		return over.over(*this);
 	}
+	constexpr Color flip() const {
+		return {1.F - r, 1.F - g, 1.F - b};
+	}
 };
 	#endif

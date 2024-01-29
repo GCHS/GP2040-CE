@@ -22,6 +22,6 @@ public:
   void ParameterDown();
 
 private:
-
+	int gradientIdx{0};
 };
 #endif

@@ -18,7 +18,9 @@ public:
 	ButtonWaves(PixelMatrix &matrix);
   ButtonWaves(PixelMatrix &matrix, std::vector<Pixel> &pixels);
 	~ButtonWaves();
-
+private:
+	void init();
+public:
 	void Animate(RGB (&frame)[100]);
   void ParameterUp();
   void ParameterDown();
@@ -50,7 +52,7 @@ private:                                                 //and has to travel the
 	};
 	unsigned long lastMillis = -1;
 
-	std::array<float, BUTTON_COUNT> bgAniMask{};
+	std::vector<float> bgAniMask;
 
 	glowbox::ring_buffer<Wave, maxWaves> waves;
 
