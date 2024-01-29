@@ -79,24 +79,6 @@ private:
 	 unsigned long int wasPressed = 0UL;
 };
 
-inline void ButtonWaves::drawWaves(std::vector<Color> &onto) {
-	const float nowMillis = millis();
-	std::vector<Color> pixels{onto.size()};
-	for(auto& w : waves) {
-		const float age = nowMillis - w.spawnTimeMillis;
-		if(age < maxWaveAgeMillis) {
-			const float minFullR = age * velocityPerMilli;
-			drawWave(pixels, w, minFullR, minFullR + waveWidth);
-		}
-	}
-	const auto dt = nowMillis - lastMillis;
-	for(int i = 0; i < BUTTON_COUNT; ++i) {
-		onto[i] = composite(pixels[i], onto[i], bgAniMask[i]);
-		bgAniMask[i] -= dt * maskOptions[int(currentMaskSetting)].dimmingPerMilli;
-	}
-	lastMillis = nowMillis;
-}
-
 inline ButtonWaves::MaskSetting& operator++(ButtonWaves::MaskSetting& s) {
 	return s = ButtonWaves::MaskSetting((int(s) + 1) % int(ButtonWaves::MaskSetting::size));
 }

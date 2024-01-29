@@ -40,6 +40,9 @@ ButtonWaves::~ButtonWaves() { pressed = nullptr; }
 void ButtonWaves::init(){
 	bgAniMask = std::vector<float>{};
 	bgAniMask.resize(matrix->getPixelCount(), 0.F);
+	for(size_t i = 0; i < bgAniMask.size(); i++){
+		bgAniMask[i] = -1.F;
+	}
 	if(AnimationStation::options.buttonWavesMaskSetting < 0 || AnimationStation::options.buttonWavesMaskSetting >= int(MaskSetting::size)){
 		AnimationStation::options.buttonWavesMaskSetting = int(currentMaskSetting);
 	}else{
@@ -142,4 +145,26 @@ void ButtonWaves::drawWave(std::vector<Color> &pixels, const Wave &w, const floa
 			pixels[i] = getBleedGradientColor(w.c, positionInGradient, pixels[i]);
 		}
 	}
+}
+
+void ButtonWaves::drawWaves(std::vector<Color> &onto) {
+	const float nowMillis = millis();
+	std::vector<Color> pixels{onto.size()};
+	for(auto& w : waves) {
+		const float age = nowMillis - w.spawnTimeMillis;
+		if(age < maxWaveAgeMillis) {
+			const float minFullR = age * velocityPerMilli;
+			drawWave(pixels, w, minFullR, minFullR + waveWidth);
+		}
+	}
+	const auto dt = nowMillis - lastMillis;
+	for(int i = 0; i < BUTTON_COUNT; ++i) {
+		if(bgAniMask[i] < 0){
+			onto[i] = {0, 0, 0};
+		}else{
+			onto[i] = composite(pixels[i], onto[i], bgAniMask[i]);
+			bgAniMask[i] -= dt * maskOptions[int(currentMaskSetting)].dimmingPerMilli;
+		}
+	}
+	lastMillis = nowMillis;
 }
