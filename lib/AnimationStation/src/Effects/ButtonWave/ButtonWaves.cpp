@@ -3,34 +3,49 @@
 #include <algorithm>
 #include "BakedButtonDistances.hpp"
 
-constexpr std::array<Color, 16> RANDOM_COLORS{
-	Color(0.859375f, 0.0f,        0.5f),      // magenta
-	Color(1.0f,      0.29296875f, 0.8515625f),// pink
-	Color(1.0f,      0.0625f,     0.0f),      // red
-	Color(1.0f,      0.5f,        0.0f),      // red-orange
-	Color(0.859375f, 0.5f,        0.0f),      // orange
-	Color(1.0f,      1.0f,        0.0f),      // yellow
-	Color(0.5f,      0.859375f,   0.0f),      // lime green
-	Color(0.0f,      1.0f,        0.5f),      // cyan
-	Color(0.0f,      0.859375f,   0.859375f), // blue
-	Color(0.0f,      0.5f,        1.0f),      // cobalt blue
-	Color(0.0625f,   0.0f,        1.0f),      // violet?
-	Color(0.5f,      0.0f,        0.859375f), // purple
-	Color(0.5f,      0.75f,       0.859375f), // lilac?
-	Color(1.0f,      1.0f,        1.0f),      // white
-	Color(1.5f,      1.5f,        1.5f),      // superwhite
-	Color(1.25f,     1.0f,        1.6f),      // superpurple
+#include "../../AnimationStation.hpp"
+
+constexpr std::array<Color, 12> RANDOM_COLORS{
+	Color{1.0F, 0.0F, 0.0F}, //Red
+	Color{1.0F, 0.5F, 0.0F}, //Orange
+	Color{1.0F, 1.0F, 0.0F}, //Yellow
+	Color{0.5F, 1.0F, 0.0F}, //LimeGreen
+	Color{0.0F, 1.0F, 0.0F}, //Green
+	Color{0.0F, 1.0F, 0.5F}, //Seafoam
+	Color{0.0F, 1.0F, 1.0F}, //Aqua
+	Color{0.0F, 0.5F, 1.0F}, //SkyBlue
+	Color{0.0F, 0.0F, 1.0F}, //Blue
+	Color{0.5F, 0.0F, 1.0F}, //Purple
+	Color{1.0F, 0.0F, 1.0F}, //Pink
+	Color{1.0F, 0.0F, 0.5F}, //Magenta
 };
 
+static constexpr float bgBrightness = 4.F/16.F;
+
 Color getRandomColor() {
-	return RANDOM_COLORS[(time_us_32() * 13)%RANDOM_COLORS.size()];
+	return RANDOM_COLORS[(time_us_32() * 11)%RANDOM_COLORS.size()];
 }
 
-ButtonWaves::ButtonWaves(PixelMatrix &matrix) : Animation(matrix) {}
+ButtonWaves::ButtonWaves(PixelMatrix &matrix) : Animation(matrix) {
+	init();
+}
 
-ButtonWaves::ButtonWaves (PixelMatrix &matrix, std::vector<Pixel> &pixels) : Animation(matrix), pressed(&pixels) {}
+ButtonWaves::ButtonWaves (PixelMatrix &matrix, std::vector<Pixel> &pixels) : Animation(matrix), pressed(&pixels) {
+	for(const auto& p : *pressed) {wasPressed |= 1UL << p.index;}
+	init();
+}
 
 ButtonWaves::~ButtonWaves() { pressed = nullptr; }
+
+void ButtonWaves::init(){
+	bgAniMask = std::vector<float>{};
+	bgAniMask.resize(matrix->getPixelCount(), 0.F);
+	if(AnimationStation::options.buttonWavesMaskSetting < 0 || AnimationStation::options.buttonWavesMaskSetting >= int(MaskSetting::size)){
+		AnimationStation::options.buttonWavesMaskSetting = int(currentMaskSetting);
+	}else{
+		currentMaskSetting = MaskSetting(AnimationStation::options.buttonWavesMaskSetting);
+	}
+}
 
 void ButtonWaves::Animate(RGB (&frame)[100]) {
 	unsigned long int isPressed = 0UL;
@@ -69,10 +84,12 @@ void ButtonWaves::Animate(RGB (&frame)[100]) {
 
 void ButtonWaves::ParameterUp() {
 	++currentMaskSetting;
+	AnimationStation::options.buttonWavesMaskSetting = int(currentMaskSetting);
 }
 
 void ButtonWaves::ParameterDown() {
 	--currentMaskSetting;
+	AnimationStation::options.buttonWavesMaskSetting = int(currentMaskSetting);
 }
 
 Color ButtonWaves::composite(const Color& wavePx, const Color& bgPx, const float bgMask) const {
@@ -81,12 +98,12 @@ Color ButtonWaves::composite(const Color& wavePx, const Color& bgPx, const float
 			return bgPx * (wavePx.a * 2.f);
 		case ButtonWaves::MaskSetting::fadeAfterIdle: {
 			const auto coeff = std::clamp(bgMask, 0.f, 1.f);
-			return wavePx.over(bgPx * (coeff * coeff * coeff));
+			return wavePx.over(bgPx * (coeff * coeff * coeff * bgBrightness));
 		}
 		case ButtonWaves::MaskSetting::bgTrail:
 		case ButtonWaves::MaskSetting::delayedFadeout:
 		case ButtonWaves::MaskSetting::alwaysOn: {
-			return wavePx.over(bgPx * std::clamp(bgMask, 0.f, 1.f));
+			return wavePx.over(bgPx * (std::clamp(bgMask, 0.f, 1.f) * bgBrightness));
 		}
 	}
 }
@@ -99,8 +116,6 @@ void ButtonWaves::addWave(const int button_index, const Color& c) {
 	addWave(Wave(button_index, c, millis()));
 }
 
-//ButtonWaves::ButtonWaves(Kaimana& kaimana):kaimana{&kaimana}, lastMillis{millis()} {}
-
 constexpr float ButtonWaves::curveBrightness(const float brightness) {
 	return brightness;
 }
@@ -112,10 +127,7 @@ constexpr Color ButtonWaves::getBleedGradientColor(const Color &over, const floa
 
 static ButtonDistanceTable distances;
 
-
-
 void ButtonWaves::drawWave(std::vector<Color> &pixels, const Wave &w, const float minFullR, const float maxFullR) {
-	//unsigned long startTime = micros();
 	for(int i = 0; i < BUTTON_COUNT; ++i) {
 		const float& d = distances(w.spawnButtonIndex, i);
 		const bool fartherThanMinFull = d >= minFullR, closerThanMaxFull = d <= maxFullR;
@@ -130,7 +142,4 @@ void ButtonWaves::drawWave(std::vector<Color> &pixels, const Wave &w, const floa
 			pixels[i] = getBleedGradientColor(w.c, positionInGradient, pixels[i]);
 		}
 	}
-	//Serial.print("Wave: ");
-	//Serial.print(micros() - startTime);
-	//Serial.println("us");
 }
