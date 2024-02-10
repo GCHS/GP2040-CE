@@ -39,7 +39,7 @@ using namespace std;
 
 extern struct fsdata_file file__index_html[];
 
-const static char* spaPaths[] = { "/display-config", "/led-config", "/pin-mapping", "/keyboard-mapping", "/settings", "/reset-settings", "/add-ons", "/custom-theme", "/macro", "/peripheral-mapping" };
+const static char* spaPaths[] = { "/backup", "/display-config", "/led-config", "/pin-mapping", "/keyboard-mapping", "/settings", "/reset-settings", "/add-ons", "/custom-theme", "/macro", "/peripheral-mapping" };
 const static char* excludePaths[] = { "/css", "/images", "/js", "/static" };
 const static uint32_t rebootDelayMs = 500;
 static string http_post_uri;
@@ -158,7 +158,7 @@ static void __attribute__((noinline)) docToPin(Pin_t& pin, const DynamicJsonDocu
 				profiles.gpioMappingsSets[0].pins[oldPin].action = GpioAction::NONE;
 				profiles.gpioMappingsSets[1].pins[oldPin].action = GpioAction::NONE;
 				profiles.gpioMappingsSets[2].pins[oldPin].action = GpioAction::NONE;
-			}            
+			}
 		}
 	}
 }
@@ -491,7 +491,7 @@ std::string getDisplayOptions() // Manually set Document Attributes for the disp
 	writeDoc(doc, "enabled", displayOptions.enabled ? 1 : 0);
 	writeDoc(doc, "i2cAddress", displayOptions.i2cAddress);
 	writeDoc(doc, "i2cBlock", displayOptions.i2cBlock);
-	writeDoc(doc, "flipDisplay", displayOptions.flip ? 1 : 0);
+	writeDoc(doc, "flipDisplay", displayOptions.flip);
 	writeDoc(doc, "invertDisplay", displayOptions.invert ? 1 : 0);
 	writeDoc(doc, "buttonLayout", displayOptions.buttonLayout);
 	writeDoc(doc, "buttonLayoutRight", displayOptions.buttonLayoutRight);
@@ -771,6 +771,10 @@ std::string setLedOptions()
 	docToPin(ledOptions.pledPin2, doc, "pledPin2");
 	docToPin(ledOptions.pledPin3, doc, "pledPin3");
 	docToPin(ledOptions.pledPin4, doc, "pledPin4");
+	readDoc(ledOptions.pledIndex1, doc, "pledIndex1");
+	readDoc(ledOptions.pledIndex2, doc, "pledIndex2");
+	readDoc(ledOptions.pledIndex3, doc, "pledIndex3");
+	readDoc(ledOptions.pledIndex4, doc, "pledIndex4");
 	readDoc(ledOptions.pledColor, doc, "pledColor");
 
 	Storage::getInstance().save();
@@ -823,6 +827,10 @@ std::string getLedOptions()
 	writeDoc(doc, "pledPin2", ledOptions.pledPin2);
 	writeDoc(doc, "pledPin3", ledOptions.pledPin3);
 	writeDoc(doc, "pledPin4", ledOptions.pledPin4);
+	writeDoc(doc, "pledIndex1", ledOptions.pledIndex1);
+	writeDoc(doc, "pledIndex2", ledOptions.pledIndex2);
+	writeDoc(doc, "pledIndex3", ledOptions.pledIndex3);
+	writeDoc(doc, "pledIndex4", ledOptions.pledIndex4);
 	writeDoc(doc, "pledColor", ((RGB)ledOptions.pledColor).value(LED_FORMAT_RGB));
 
 	return serialize_json(doc);
@@ -881,6 +889,10 @@ std::string setCustomTheme()
 	options.customThemeR3Pressed	= readDocDefaultToZero("R3", "d");
 	options.customThemeA1Pressed	= readDocDefaultToZero("A1", "d");
 	options.customThemeA2Pressed	= readDocDefaultToZero("A2", "d");
+	
+	uint32_t pressCooldown = 0;
+	readDoc(pressCooldown, doc, "buttonPressColorCooldownTimeInMs");
+	options.buttonPressColorCooldownTimeInMs = pressCooldown;
 
 	AnimationStation::SetOptions(options);
 	AnimationStore.save();
@@ -930,6 +942,7 @@ std::string getCustomTheme()
 	writeDoc(doc, "L3", "d", options.customThemeL3Pressed);
 	writeDoc(doc, "R3", "u", options.customThemeR3);
 	writeDoc(doc, "R3", "d", options.customThemeR3Pressed);
+	writeDoc(doc, "buttonPressColorCooldownTimeInMs", options.buttonPressColorCooldownTimeInMs);
 
 	return serialize_json(doc);
 }
@@ -1245,7 +1258,6 @@ std::string setAddonOptions()
 	docToValue(onBoardLedOptions.enabled, doc, "BoardLedAddonEnabled");
 
     TurboOptions& turboOptions = Storage::getInstance().getAddonOptions().turboOptions;
-	docToPin(turboOptions.buttonPin, doc, "turboPin");
 	docToPin(turboOptions.ledPin, doc, "turboPinLED");
 	docToValue(turboOptions.shotCount, doc, "turboShotCount");
 	docToValue(turboOptions.shmupModeEnabled, doc, "shmupMode");
@@ -1393,7 +1405,7 @@ std::string setWiiControls()
 {
 	DynamicJsonDocument doc = get_post_data();
 	WiiOptions& wiiOptions = Storage::getInstance().getAddonOptions().wiiOptions;
-    
+
     readDoc(wiiOptions.controllers.nunchuk.buttonC, doc, "nunchuk.buttonC");
     readDoc(wiiOptions.controllers.nunchuk.buttonZ, doc, "nunchuk.buttonZ");
     readDoc(wiiOptions.controllers.nunchuk.stick.x.axisType, doc, "nunchuk.analogStick.x.axisType");
@@ -1639,7 +1651,6 @@ std::string getAddonOptions()
 	writeDoc(doc, "BoardLedAddonEnabled", onBoardLedOptions.enabled);
 
     const TurboOptions& turboOptions = Storage::getInstance().getAddonOptions().turboOptions;
-	writeDoc(doc, "turboPin", cleanPin(turboOptions.buttonPin));
 	writeDoc(doc, "turboPinLED", cleanPin(turboOptions.ledPin));
 	writeDoc(doc, "turboShotCount", turboOptions.shotCount);
 	writeDoc(doc, "shmupMode", turboOptions.shmupModeEnabled);
@@ -1754,7 +1765,7 @@ std::string setMacroAddonOptions()
 
 		if (++macrosIndex >= MAX_MACRO_LIMIT) break;
 	}
-	
+
 	macroOptions.macroList_count = MAX_MACRO_LIMIT;
 
 	Storage::getInstance().save();

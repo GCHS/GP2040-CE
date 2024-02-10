@@ -9,8 +9,8 @@
 
 class PeripheralManager {
 public:
-    PeripheralManager();
-    ~PeripheralManager() {}
+    PeripheralManager(){}
+	PeripheralManager(PeripheralManager const&) = delete;
 	void operator=(PeripheralManager const&)  = delete;
 	static PeripheralManager& getInstance() // Thread-safe storage ensures cross-thread talk
 	{
@@ -22,17 +22,21 @@ public:
     PeripheralSPI* getSPI(uint8_t block);
     PeripheralUSB* getUSB(uint8_t block);
 
+    void initUSB();
+    void initI2C();
+    void initSPI();
+
     bool isI2CEnabled(uint8_t block);
     bool isSPIEnabled(uint8_t block);
     bool isUSBEnabled(uint8_t block);
 private:
-    PeripheralI2C* blockI2C0 = nullptr;
-    PeripheralI2C* blockI2C1 = nullptr;
+    PeripheralI2C blockI2C0;
+    PeripheralI2C blockI2C1;
 
-    PeripheralSPI* blockSPI0 = nullptr;
-    PeripheralSPI* blockSPI1 = nullptr;
+    PeripheralSPI blockSPI0;
+    PeripheralSPI blockSPI1;
 
-    PeripheralUSB* blockUSB0 = nullptr;
+    PeripheralUSB blockUSB0;
 };
 
 #endif

@@ -41,7 +41,9 @@ typedef enum
   HOTKEY_LEDS_PRESS_PARAMETER_DOWN,
 	HOTKEY_LEDS_PARAMETER_DOWN,
 	HOTKEY_LEDS_BRIGHTNESS_UP,
-	HOTKEY_LEDS_BRIGHTNESS_DOWN
+	HOTKEY_LEDS_BRIGHTNESS_DOWN,
+	HOTKEY_LEDS_FADETIME_UP,
+	HOTKEY_LEDS_FADETIME_DOWN
 } AnimationHotkey;
 
 struct __attribute__ ((__packed__)) AnimationOptions
@@ -91,9 +93,10 @@ struct __attribute__ ((__packed__)) AnimationOptions
   uint32_t customThemeR3Pressed;
   uint32_t customThemeA1Pressed;
   uint32_t customThemeA2Pressed;
+  uint32_t buttonPressColorCooldownTimeInMs;  
 
-  int rainbowScrollGradientIndex;
-  int buttonWavesMaskSetting;
+  uint32_t rainbowScrollGradientIndex;
+  uint32_t buttonWavesMaskSetting;
 };
 
 class AnimationStation

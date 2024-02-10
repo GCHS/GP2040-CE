@@ -1,13 +1,13 @@
 /*
  * SPDX-License-Identifier: MIT
- * SPDX-FileCopyrightText: Copyright (c) 2021 Jason Skuby (mytechtoybox.com)
+ * SPDX-FileCopyrightText: Copyright (c) 2024 OpenStickCommunity (gp2040-ce.info)
  */
 
 #include "addons/ps4mode.h"
 #include "helper.h"
 #include "config.pb.h"
 
-#include "ps4_driver.h"
+#include "drivers/shared/ps4data.h"
 
 #include "mbedtls/error.h"
 #include "mbedtls/rsa.h"

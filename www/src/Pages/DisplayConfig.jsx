@@ -34,6 +34,9 @@ const BUTTON_LAYOUTS = [
 	{ label: 'Fightboard Mirrored', value: 11 }, // BUTTON_LAYOUT_FIGHTBOARD_MIRRORED
 	{ label: 'Custom', value: 12 }, // BUTTON_LAYOUT_CUSTOM
 	{ label: 'Open_Core0 WASD', value: 13 }, // BUTTON_LAYOUT_OPENCORE0WASDA
+	{ label: 'Stickless 13', value: 14 }, // BUTTON_LAYOUT_STICKLESS_13
+    { label: 'Stickless 16', value: 15 }, // BUTTON_LAYOUT_STICKLESS_16
+    { label: 'Stickless 14', value: 16 }, // BUTTON_LAYOUT_STICKLESS_14
 ];
 
 const BUTTON_LAYOUTS_RIGHT = [
@@ -56,6 +59,9 @@ const BUTTON_LAYOUTS_RIGHT = [
 	{ label: 'Custom', value: 16 }, // BUTTON_LAYOUT_CUSTOM
 	{ label: 'Keyboard 8', value: 17 }, // BUTTON_LAYOUT_KEYBOARD8B
 	{ label: 'Open_Core0 WASD', value: 18 }, // BUTTON_LAYOUT_OPENCORE0WASDB
+	{ label: 'Stickless 13', value: 19 }, // BUTTON_LAYOUT_STICKLESS_13B
+    { label: 'Stickless 16', value: 20 }, // BUTTON_LAYOUT_STICKLESS_16B
+    { label: 'Stickless 14', value: 21 }, // BUTTON_LAYOUT_STICKLESS_14B
 ];
 
 const SPLASH_MODES = [
@@ -278,7 +284,7 @@ export default function DisplayConfigPage() {
 			onSubmit={onSuccess}
 			initialValues={defaultValues}
 		>
-			{({ handleSubmit, handleChange, values, errors }) => {
+			{({ handleSubmit, handleChange, values, errors, setFieldValue }) => {
                 const handlePeripheralChange = (e) => {
                     let device = getSelectedPeripheral('i2c', e.target.value);
                     handleChange(e);
@@ -382,6 +388,23 @@ export default function DisplayConfigPage() {
                                             </option>
                                         ))}
                                     </FormSelect>
+                                    <div className="col-sm-3 mb-3">
+                                        <label className="form-label">{t('DisplayConfig:form.power-management-header')}</label>
+                                        <Form.Check
+                                            label={t('DisplayConfig:form.turn-off-when-suspended')}
+                                            type="switch"
+                                            name="turnOffWhenSuspended"
+                                            className="align-middle"
+                                            isInvalid={false}
+                                            checked={Boolean(values.turnOffWhenSuspended)}
+                                            onChange={(e) => {
+                                                setFieldValue(
+                                                    'turnOffWhenSuspended',
+                                                    e.target.checked ? 1 : 0,
+                                                );
+                                            }}
+                                        />
+                                    </div>
                                 </Row>
                                 <h1>{t('DisplayConfig:section.layout-header')}</h1>
                                 <Row className="mb-4">

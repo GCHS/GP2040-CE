@@ -18,22 +18,6 @@ enum DualDirectionalCombinationMode
 #define DUAL_DIRECTIONAL_ENABLED 0
 #endif
 
-#ifndef PIN_DUAL_DIRECTIONAL_UP
-#define PIN_DUAL_DIRECTIONAL_UP -1
-#endif
-
-#ifndef PIN_DUAL_DIRECTIONAL_DOWN
-#define PIN_DUAL_DIRECTIONAL_DOWN -1
-#endif
-
-#ifndef PIN_DUAL_DIRECTIONAL_LEFT
-#define PIN_DUAL_DIRECTIONAL_LEFT -1
-#endif
-
-#ifndef PIN_DUAL_DIRECTIONAL_RIGHT
-#define PIN_DUAL_DIRECTIONAL_RIGHT -1
-#endif
-
 #ifndef DUAL_DIRECTIONAL_STICK_MODE
 #define DUAL_DIRECTIONAL_STICK_MODE DPAD_MODE_DIGITAL
 #endif
@@ -56,6 +40,8 @@ public:
 private:
     void debounce();
     uint8_t gpadToBinary(DpadMode, GamepadState);
+    uint8_t updateDpadDDI(uint8_t dpad, DpadDirection direction);
+    uint8_t filterToFourWayModeDDI(uint8_t dpad);
     void SOCDDualClean(SOCDMode);
     uint8_t SOCDCombine(SOCDMode, uint8_t);
     uint8_t SOCDGamepadClean(uint8_t, bool isLastWin);

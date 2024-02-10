@@ -15,6 +15,11 @@ const API_BINDING = {
 		get: WebApi.getDisplayOptions,
 		set: WebApi.setDisplayOptions,
 	},
+	splash: {
+		label: 'Splash Image',
+		get: WebApi.getSplashImage,
+		set: WebApi.setSplashImage,
+	},
 	gamepad: {
 		label: 'Gamepad',
 		get: WebApi.getGamepadOptions,
@@ -25,6 +30,11 @@ const API_BINDING = {
 		label: 'Custom LED Theme',
 		get: WebApi.getCustomTheme,
 		set: WebApi.setCustomTheme,
+	},
+	macros: {
+		label: 'Macro Mappings',
+		get: WebApi.getMacroAddonOptions,
+		set: WebApi.setMacroAddonOptions,
 	},
 	pins: {
 		label: 'Pin Mappings',
@@ -230,9 +240,6 @@ export default function BackupPage() {
 
 	return (
 		<>
-			<Section title={t('BackupPage:header-text')}>
-				<i>{t('BackupPage:sub-header-text')}</i>
-			</Section>
 			<Section title={t('BackupPage:save-header-text')}>
 				<Col>
 					<Form.Group className={'row mb-3'}>

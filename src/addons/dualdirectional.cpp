@@ -1,5 +1,4 @@
 #include "addons/dualdirectional.h"
-#include "GamepadOptions.h"
 #include "storagemanager.h"
 #include "helper.h"
 #include "config.pb.h"
@@ -71,6 +70,54 @@ void DualDirectionalInput::debounce()
     }
 }
 
+
+uint8_t DualDirectionalInput::updateDpadDDI(uint8_t dpad, DpadDirection direction)
+{
+	static bool inList[] = {false, false, false, false, false}; // correspond to DpadDirection: none, up, down, left, right
+	static list<DpadDirection> dpadList;
+
+	if(dpad & getMaskFromDirection(direction))
+	{
+		if(!inList[direction])
+		{
+			dpadList.push_back(direction);
+			inList[direction] = true;
+		}
+	}
+	else
+	{
+		if(inList[direction])
+		{
+			dpadList.remove(direction);
+			inList[direction] = false;
+		}
+	}
+
+	if(dpadList.empty()) {
+		return 0;
+	}
+	else {
+		return getMaskFromDirection(dpadList.back());
+	}
+}
+
+/**
+ * @brief Filter diagonals out of the dpad, making the device work as a 4-way lever.
+ *
+ * The most recent cardinal direction wins.
+ *
+ * @param dpad The GameState.dpad value.
+ * @return uint8_t The new dpad value.
+ */
+uint8_t DualDirectionalInput::filterToFourWayModeDDI(uint8_t dpad)
+{
+	updateDpadDDI(dpad, DIRECTION_UP);
+	updateDpadDDI(dpad, DIRECTION_DOWN);
+	updateDpadDDI(dpad, DIRECTION_LEFT);
+	return updateDpadDDI(dpad, DIRECTION_RIGHT);
+}
+
+
 void DualDirectionalInput::preprocess()
 {
     const DualDirectionalOptions& options = Storage::getInstance().getAddonOptions().dualDirectionalOptions;
@@ -92,7 +139,7 @@ void DualDirectionalInput::preprocess()
 
     // 4-way before SOCD, might have better history without losing any coherent functionality
     if (options.fourWayMode) {
-        dualState = filterToFourWayMode(dualState);
+        dualState = filterToFourWayModeDDI(dualState);
     }
 
     // Combined Mode
@@ -176,16 +223,14 @@ void DualDirectionalInput::process()
 }
 
 void DualDirectionalInput::OverrideGamepad(Gamepad * gamepad, DpadMode mode, uint8_t dpad) {
-    uint8_t input_mode = gamepad->getOptions().inputMode;
-    
     switch (mode) {
         case DPAD_MODE_LEFT_ANALOG:
-            gamepad->state.lx = dpadToAnalogX(dpad, input_mode);
-            gamepad->state.ly = dpadToAnalogY(dpad, input_mode);
+            gamepad->state.lx = dpadToAnalogX(dpad);
+            gamepad->state.ly = dpadToAnalogY(dpad);
             break;
         case DPAD_MODE_RIGHT_ANALOG:
-            gamepad->state.rx = dpadToAnalogX(dpad, input_mode);
-            gamepad->state.ry = dpadToAnalogY(dpad, input_mode);
+            gamepad->state.rx = dpadToAnalogX(dpad);
+            gamepad->state.ry = dpadToAnalogY(dpad);
             break;
         case DPAD_MODE_DIGITAL:
             gamepad->state.dpad = dpad;

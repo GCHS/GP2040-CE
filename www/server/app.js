@@ -47,7 +47,6 @@ app.get('/api/getDisplayOptions', (req, res) => {
 		splashMode: 3,
 		splashChoice: 0,
 		splashDuration: 0,
-		splashImage: Array(16 * 64).fill(255),
 		buttonLayoutCustomOptions: {
 			params: {
 				layout: 2,
@@ -93,14 +92,14 @@ app.get('/api/getGamepadOptions', (req, res) => {
 		profileNumber: 1,
 		ps4ControllerType: 0,
 		debounceDelay: 5,
-        inputModeB1: 1,
-        inputModeB2: 0,
-        inputModeB3: 2,
-        inputModeB4: 4,
-        inputModeL1: -1,
-        inputModeL2: -1,
-        inputModeR1: -1,
-        inputModeR2: 3,
+		inputModeB1: 1,
+		inputModeB2: 0,
+		inputModeB3: 2,
+		inputModeB4: 4,
+		inputModeL1: -1,
+		inputModeL2: -1,
+		inputModeR1: -1,
+		inputModeR2: 3,
 		ps4ReportHack: 0,
 		hotkey01: {
 			auxMask: 32768,
@@ -219,6 +218,10 @@ app.get('/api/getLedOptions', (req, res) => {
 		pledPin2: 13,
 		pledPin3: 14,
 		pledPin4: 15,
+		pledIndex1: 12,
+		pledIndex2: 13,
+		pledIndex3: 14,
+		pledIndex4: 15,
 		pledColor: 65280,
 		turnOffWhenSuspended: 0,
 	});
@@ -376,7 +379,6 @@ app.get('/api/getProfileOptions', (req, res) => {
 
 app.get('/api/getAddonsOptions', (req, res) => {
 	return res.send({
-		turboPin: -1,
 		turboPinLED: -1,
 		sliderModeZero: 0,
 		turboShotCount: 20,
@@ -505,7 +507,6 @@ app.get('/api/getMacroAddonOptions', (req, res) => {
 		macroPin: -1,
 		macroBoardLedEnabled: 1,
 		InputMacroAddonEnabled: 1,
-		usedPins: Object.values(picoController),
 	});
 });
 

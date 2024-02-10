@@ -18,12 +18,8 @@ execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --always --dirty
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	OUTPUT_VARIABLE GIT_REPO_VERSION
 	OUTPUT_STRIP_TRAILING_WHITESPACE)
-string(REGEX REPLACE "v" "" CMAKE_GIT_REPO_VERSION ${GIT_REPO_VERSION})
-string(REGEX REPLACE "-RC.*" "" CMAKE_GIT_REPO_VERSION ${CMAKE_GIT_REPO_VERSION})
-string(REGEX REPLACE "-g.*" "" CMAKE_GIT_REPO_VERSION ${CMAKE_GIT_REPO_VERSION})
-string(REGEX REPLACE "-dirty.*" "" CMAKE_GIT_REPO_VERSION ${CMAKE_GIT_REPO_VERSION})
-string(REGEX REPLACE "-" "." CMAKE_GIT_REPO_VERSION ${CMAKE_GIT_REPO_VERSION})
-string(REGEX REPLACE "^.......$" "0.0.0" CMAKE_GIT_REPO_VERSION ${CMAKE_GIT_REPO_VERSION}) # fix if all we have is the git SHA
+string(REGEX REPLACE "v([0-9]+\\.[0-9]+\\.[0-9]+).*" "\\1" CMAKE_GIT_REPO_VERSION ${GIT_REPO_VERSION})
+string(REGEX REPLACE "^(.......-.*)|(.......)$" "0.0.0" CMAKE_GIT_REPO_VERSION ${CMAKE_GIT_REPO_VERSION}) # fix if all we have is the git SHA
 configure_file("headers/version.h.in" "headers/version.h")
 message("GIT_REPO_VERSION is ${GIT_REPO_VERSION}")
 message("CMAKE_GIT_REPO_VERSION is ${CMAKE_GIT_REPO_VERSION}")
@@ -146,11 +142,36 @@ src/main.cpp
 src/gp2040.cpp
 src/gp2040aux.cpp
 src/gamepad.cpp
+src/gamepad/GamepadDebouncer.cpp
+src/gamepad/GamepadState.cpp
 src/addonmanager.cpp
 src/configmanager.cpp
+src/drivers/shared/xinput_host.cpp
+src/drivers/shared/xgip_protocol.cpp
+src/drivers/astro/AstroDriver.cpp
+src/drivers/egret/EgretDriver.cpp
+src/drivers/hid/HIDDriver.cpp
+src/drivers/keyboard/KeyboardDriver.cpp
+src/drivers/mdmini/MDMiniDriver.cpp
+src/drivers/neogeo/NeoGeoDriver.cpp
+src/drivers/net/NetDriver.cpp
+src/drivers/pcengine/PCEngineDriver.cpp
+src/drivers/ps4/PS4Driver.cpp
+src/drivers/psclassic/PSClassicDriver.cpp
+src/drivers/switch/SwitchDriver.cpp
+src/drivers/xbone/XBOneDriver.cpp
+src/drivers/xboxog/xid/xid_driver.c
+src/drivers/xboxog/xid/xid_gamepad.c
+src/drivers/xboxog/xid/xid_remote.c
+src/drivers/xboxog/xid/xid_steelbattalion.c
+src/drivers/xboxog/xid/xid.c
+src/drivers/xboxog/XboxOriginalDriver.cpp
+src/drivers/xinput/XInputDriver.cpp
+src/drivermanager.cpp
 src/peripheralmanager.cpp
 src/storagemanager.cpp
 src/system.cpp
+src/usbdriver.cpp
 src/usbhostmanager.cpp
 src/config_legacy.cpp
 src/config_utils.cpp
@@ -177,8 +198,6 @@ src/addons/wiiext.cpp
 src/addons/input_macro.cpp
 src/addons/snes_input.cpp
 src/addons/inputhistory.cpp
-src/gamepad/GamepadDebouncer.cpp
-src/gamepad/GamepadDescriptors.cpp
 src/addons/tilt.cpp
 src/addons/xbonepassthrough.cpp
 ${PROTO_OUTPUT_DIR}/enums.pb.c
@@ -209,7 +228,6 @@ PicoPeripherals
 WiiExtension
 SNESpad
 pico_mbedtls
-TinyUSB_Gamepad
 nanopb
 )
 
@@ -217,6 +235,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 headers
 headers/addons
 headers/configs
+headers/drivers
 headers/gamepad
 configs/${GP2040_BOARDCONFIG}
 ${PROTO_OUTPUT_DIR}

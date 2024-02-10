@@ -8,11 +8,7 @@
 #include "host/usbh.h"
 #include "host/usbh_pvt.h"
 
-#include "xinput_host.h"
-
-void USBHostManager::setDataPin(uint8_t inPin) {
-    dataPin = inPin;
-}
+#include "drivers/shared/xinput_host.h"
 
 void USBHostManager::start() {
     // This will happen after Gamepad has initialized
@@ -23,6 +19,15 @@ void USBHostManager::start() {
             tuh_init(BOARD_TUH_RHPORT);
             sleep_us(10); // ensure we are ready
             tuh_ready = true;
+        }
+    }
+}
+
+// Shut down the USB bus if we are running USB right now
+void USBHostManager::shutdown() {
+    if ( !addons.empty() ) {
+        if (PeripheralManager::getInstance().isUSBEnabled(0)) {
+            tuh_rhport_reset_bus(BOARD_TUH_RHPORT, false);
         }
     }
 }

@@ -77,7 +77,7 @@ const schema = yup.object().shape({
 		.min(1)
 		.max(10)
 		.label('Brightness Steps'),
-	dataPin: yup.number().required().validatePinWhenValue('dataPin'),
+	dataPin: yup.number().required().checkUsedPins(),
 	ledFormat: yup
 		.number()
 		.required()
@@ -205,10 +205,6 @@ const FormContext = ({
 				getLedButtons(buttonLabels, assigned, true, swapTpShareLabels),
 			];
 
-			data.pledIndex1 = data.pledType === 1 ? data.pledPin1 : -1;
-			data.pledIndex2 = data.pledType === 1 ? data.pledPin2 : -1;
-			data.pledIndex3 = data.pledType === 1 ? data.pledPin3 : -1;
-			data.pledIndex4 = data.pledType === 1 ? data.pledPin4 : -1;
 
 			setDataSources(dataSources);
 			setValues(data);
@@ -330,27 +326,6 @@ export default function LEDConfigPage() {
 		e.preventDefault();
 
 		values.pledType = parseInt(values.pledType);
-
-		// Consolidate PLED fields based on selected type
-		switch (values.pledType) {
-			case 0:
-				// PLED pin already set
-				break;
-
-			case 1:
-				values.pledPin1 = values.pledIndex1;
-				values.pledPin2 = values.pledIndex2;
-				values.pledPin3 = values.pledIndex3;
-				values.pledPin4 = values.pledIndex4;
-				break;
-
-			default:
-				values.pledPin1 = -1;
-				values.pledPin2 = -1;
-				values.pledPin3 = -1;
-				values.pledPin4 = -1;
-				break;
-		}
 
 		setValues(values);
 		handleSubmit();

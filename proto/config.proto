@@ -259,6 +259,11 @@ message LEDOptions
 	optional uint32 pledColor = 30;
 
 	optional bool turnOffWhenSuspended = 31;
+
+	optional int32 pledIndex1 = 32;
+	optional int32 pledIndex2 = 33;
+	optional int32 pledIndex3 = 34;
+	optional int32 pledIndex4 = 35;
 };
 
 // This has to be kept in sync with AnimationOptions in AnimationStation.hpp
@@ -309,6 +314,7 @@ message AnimationOptions_Proto
 	optional uint32 customThemeR3Pressed = 42;
 	optional uint32 customThemeA1Pressed = 43;
 	optional uint32 customThemeA2Pressed = 44;
+	optional uint32 buttonPressColorCooldownTimeInMs = 45;  	
 }
 
 message BootselButtonOptions
@@ -344,7 +350,7 @@ message TurboOptions
 {
 	optional bool enabled = 1;
 	
-	optional int32 buttonPin = 2;
+	optional int32 deprecatedButtonPin = 2 [deprecated = true];
 	optional int32 ledPin = 3;
 	optional uint32 shotCount = 4;
 	optional int32 shmupDialPin = 5;

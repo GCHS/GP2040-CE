@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: MIT
- * SPDX-FileCopyrightText: Copyright (c) 2021 Jason Skuby (mytechtoybox.com)
+ * SPDX-FileCopyrightText: Copyright (c) 2024 OpenStickCommunity (gp2040-ce.info)
  */
 
 #ifndef DISPLAY_H_
@@ -19,7 +19,7 @@
 #include "addons/inputhistory.h"
 
 #ifndef HAS_I2C_DISPLAY
-#define HAS_I2C_DISPLAY -1
+#define HAS_I2C_DISPLAY 0
 #endif
 
 #ifndef DISPLAY_I2C_ADDR
@@ -210,6 +210,12 @@ private:
 	void drawFightboardMirrored(int startX, int startY, int buttonRadius, int buttonPadding);
 	void drawFightboardStick(int startX, int startY, int buttonRadius, int buttonPadding);
 	void drawFightboardStickMirrored(int startX, int startY, int buttonRadius, int buttonPadding);
+	void drawStickless13A(int startX, int startY, int buttonRadius, int buttonPadding);
+	void drawSticklessButtons13B(int startX, int startY, int buttonRadius, int buttonPadding);
+	void drawStickless16A(int startX, int startY, int buttonRadius, int buttonPadding);
+	void drawSticklessButtons16B(int startX, int startY, int buttonRadius, int buttonPadding);
+	void drawStickless14A(int startX, int startY, int buttonRadius, int buttonPadding);
+	void drawSticklessButtons14B(int startX, int startY, int buttonRadius, int buttonPadding);
 	bool pressedUp();
 	bool pressedDown();
 	bool pressedLeft();
