@@ -5,7 +5,7 @@
 
 #include "../../AnimationStation.hpp"
 
-constexpr std::array<Color, 12> RANDOM_COLORS{
+static constexpr std::array<Color, 12> RANDOM_COLORS{
 	Color{1.0F, 0.0F, 0.0F}, //Red
 	Color{1.0F, 0.5F, 0.0F}, //Orange
 	Color{1.0F, 1.0F, 0.0F}, //Yellow
@@ -21,6 +21,8 @@ constexpr std::array<Color, 12> RANDOM_COLORS{
 };
 
 static constexpr float bgBrightness = 4.F/16.F;
+
+static constexpr Color ErrorColor = Color(1,0,0,1); //drawn to whole screen in case of corrupt compositing config value
 
 Color getRandomColor() {
 	return RANDOM_COLORS[(time_us_32() * 11)%RANDOM_COLORS.size()];
@@ -43,8 +45,8 @@ void ButtonWaves::init(){
 	for(size_t i = 0; i < bgAniMask.size(); i++){
 		bgAniMask[i] = -1.F;
 	}
-	if(AnimationStation::options.buttonWavesMaskSetting < 0 || AnimationStation::options.buttonWavesMaskSetting >= int(MaskSetting::size)){
-		AnimationStation::options.buttonWavesMaskSetting = int(currentMaskSetting);
+	if(AnimationStation::options.buttonWavesMaskSetting >= uint32_t(MaskSetting::size)){//check for corrupt settings
+		AnimationStation::options.buttonWavesMaskSetting = uint32_t(currentMaskSetting);
 	}else{
 		currentMaskSetting = MaskSetting(AnimationStation::options.buttonWavesMaskSetting);
 	}
@@ -108,6 +110,8 @@ Color ButtonWaves::composite(const Color& wavePx, const Color& bgPx, const float
 		case ButtonWaves::MaskSetting::alwaysOn: {
 			return wavePx.over(bgPx * (std::clamp(bgMask, 0.f, 1.f) * bgBrightness));
 		}
+		default: //something has gone wrong; draw error
+			return ErrorColor;
 	}
 }
 
