@@ -27,7 +27,7 @@ Color rainbowSquaredFlipped(float position){
 static const std::array<Color(*)(float), 3> gradients{rainbow, rainbowSquared, rainbowSquaredFlipped};
 
 RainbowScroll::RainbowScroll(PixelMatrix &matrix) : Animation(matrix) {
- if(AnimationStation::options.rainbowScrollGradientIndex < 0 || AnimationStation::options.rainbowScrollGradientIndex >= (int)gradients.size()){
+ if(AnimationStation::options.rainbowScrollGradientIndex >= (uint32_t)gradients.size()){//corrupt settings check
 	AnimationStation::options.rainbowScrollGradientIndex = gradientIdx;
  }else{
  	gradientIdx = AnimationStation::options.rainbowScrollGradientIndex;
