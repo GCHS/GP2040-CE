@@ -95,8 +95,8 @@ struct __attribute__ ((__packed__)) AnimationOptions
   uint32_t customThemeA2Pressed;
   uint32_t buttonPressColorCooldownTimeInMs;  
 
-  int rainbowScrollGradientIndex;
-  int buttonWavesMaskSetting;
+  uint32_t rainbowScrollGradientIndex;
+  uint32_t buttonWavesMaskSetting;
 };
 
 class AnimationStation
